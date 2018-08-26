@@ -26,14 +26,14 @@ func (h *Handler) GetPlayers(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) CreatePlayer(w http.ResponseWriter, r *http.Request) {
-	req := &model.Player{}
+	var req model.Player
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		sendError(w, "error", http.StatusBadRequest)
 		return
 	}
 	defer r.Body.Close()
 
-	res, err := h.Store.CreatePlayer(req)
+	res, err := h.Store.CreatePlayer(&req)
 	if err != nil {
 		sendError(w, err.Error(), http.StatusInternalServerError)
 		return

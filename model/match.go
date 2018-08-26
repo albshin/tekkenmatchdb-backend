@@ -17,10 +17,6 @@ type GetMatch struct {
 	P2Country string `json:"p2_country" db:"p2_country"`
 }
 
-type Matches struct {
-	Matches []*Match `json:"matches"`
-}
-
 // Match is an object representing the database table.
 type Match struct {
 	ID            int             `json:"id" db:"id"`

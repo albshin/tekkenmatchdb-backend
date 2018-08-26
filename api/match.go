@@ -56,14 +56,14 @@ func (h *Handler) GetMatchesByPlayerID(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) CreateMatches(w http.ResponseWriter, r *http.Request) {
-	var req model.Matches
+	var req []*model.Match
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		sendError(w, "error", http.StatusBadRequest)
 		return
 	}
 	defer r.Body.Close()
 
-	res, err := h.Store.CreateMatches(&req)
+	res, err := h.Store.CreateMatches(req)
 	if err != nil {
 		sendError(w, err.Error(), http.StatusInternalServerError)
 		return

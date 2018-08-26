@@ -64,14 +64,14 @@ func (db *PGStore) GetMatches(matchFilters *model.MatchFilter, pageParams *model
 	return matches, nil
 }
 
-func (db *PGStore) CreateMatches(m *model.Matches) (*model.Matches, error) {
+func (db *PGStore) CreateMatches(matches []*model.Match) ([]*model.Match, error) {
 	tx, err := db.Beginx()
 	if err != nil {
 		return nil, err
 	}
 	defer tx.Rollback()
 
-	for _, match := range m.Matches {
+	for _, match := range matches {
 		if err := createMatch(tx, match); err != nil {
 			return nil, err
 		}
@@ -80,7 +80,7 @@ func (db *PGStore) CreateMatches(m *model.Matches) (*model.Matches, error) {
 	if err := tx.Commit(); err != nil {
 		return nil, err
 	}
-	return m, nil
+	return matches, nil
 }
 
 func createMatch(tx *sqlx.Tx, req *model.Match) error {
@@ -177,10 +177,10 @@ func (db *PGStore) GetPlayer(playerID int) (*model.Player, error) {
 	return &player, nil
 }
 
-func (db *PGStore) GetPlayers(pageParams *model.Pagination) (*model.Players, error) {
-	var players model.Players
-	if err := db.Select(&players.Players, "SELECT * FROM players LIMIT $1 OFFSET $2", pageParams.Limit, pageParams.Offset()); err != nil {
+func (db *PGStore) GetPlayers(pageParams *model.Pagination) ([]*model.Player, error) {
+	players := make([]*model.Player, 0)
+	if err := db.Select(&players, "SELECT * FROM players LIMIT $1 OFFSET $2", pageParams.Limit, pageParams.Offset()); err != nil {
 		return nil, err
 	}
-	return &players, nil
+	return players, nil
 }

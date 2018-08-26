@@ -4,10 +4,6 @@ import (
 	"time"
 )
 
-type Players struct {
-	Players []*Player `json:"players"`
-}
-
 // Player is an object representing the database table.
 type Player struct {
 	ID         int        `json:"id" db:"id"`
