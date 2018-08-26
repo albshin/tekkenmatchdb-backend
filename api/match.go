@@ -63,6 +63,13 @@ func (h *Handler) CreateMatches(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
+	for _, match := range req {
+		if err := match.Validate(); err != nil {
+			sendError(w, "error", http.StatusBadRequest)
+			return
+		}
+	}
+
 	res, err := h.Store.CreateMatches(req)
 	if err != nil {
 		sendError(w, err.Error(), http.StatusInternalServerError)

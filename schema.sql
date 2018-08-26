@@ -1,23 +1,21 @@
+DROP TABLE IF EXISTS youtube_video_reports;
+DROP TABLE IF EXISTS video_report_categories;
 DROP TABLE IF EXISTS youtube_videos;
 DROP TABLE IF EXISTS matches;
 DROP TABLE IF EXISTS players;
-DROP TABLE IF EXISTS t7_rank;
-DROP TABLE IF EXISTS t7_character;
-DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS t7_ranks;
+DROP TABLE IF EXISTS t7_characters;
 
-CREATE TABLE IF NOT EXISTS t7_character (
+CREATE TABLE IF NOT EXISTS t7_characters (
     character_name text NOT NULL PRIMARY KEY
 );
 
-CREATE TABLE IF NOT EXISTS t7_rank (
+CREATE TABLE IF NOT EXISTS t7_ranks (
     rank_name text NOT NULL PRIMARY KEY
 );
 
-CREATE TABLE IF NOT EXISTS users (
-    id serial NOT NULL PRIMARY KEY,
-    email text NOT NULL,
-    created_at timestamptz NOT NULL DEFAULT NOW(),
-    updated_at timestamptz NOT NULL DEFAULT NOW()
+CREATE TABLE IF NOT EXISTS video_report_categories (
+    category_name text NOT NULL PRIMARY KEY
 );
 
 CREATE TABLE IF NOT EXISTS players (
@@ -28,16 +26,17 @@ CREATE TABLE IF NOT EXISTS players (
     updated_at timestamptz NOT NULL DEFAULT NOW()
 );
 
+
 CREATE TABLE IF NOT EXISTS matches (
     id serial NOT NULL PRIMARY KEY,
     match_date date NOT NULL,
     event_name text NOT NULL,
     p1_id int NOT NULL REFERENCES players(id),
     p2_id int NOT NULL REFERENCES players(id),
-    p1_rank text REFERENCES t7_rank(rank_name) ON UPDATE CASCADE, 
-    p2_rank text REFERENCES t7_rank(rank_name) ON UPDATE CASCADE,
-    p1_character text NOT NULL REFERENCES t7_character(character_name) ON UPDATE CASCADE,
-    p2_character text NOT NULL REFERENCES t7_character(character_name) ON UPDATE CASCADE,
+    p1_rank text REFERENCES t7_ranks(rank_name) ON UPDATE CASCADE, 
+    p2_rank text REFERENCES t7_ranks(rank_name) ON UPDATE CASCADE,
+    p1_character text NOT NULL REFERENCES t7_characters(character_name) ON UPDATE CASCADE,
+    p2_character text NOT NULL REFERENCES t7_characters(character_name) ON UPDATE CASCADE,
     winner text NOT NULL CHECK (winner IN ('p1', 'p2', 'draw')), 
     created_at timestamptz NOT NULL DEFAULT NOW(),
     updated_at timestamptz NOT NULL DEFAULT NOW()
@@ -55,7 +54,20 @@ CREATE TABLE IF NOT EXISTS youtube_videos (
     FOREIGN KEY (match_id) REFERENCES matches(id)
 );
 
-INSERT INTO t7_character (character_name) VALUES
+CREATE TABLE IF NOT EXISTS youtube_video_reports (
+    id serial NOT NULL PRIMARY KEY,
+    youtube_video_id int NOT NULL,
+    category text NOT NULL REFERENCES video_report_categories(category_name),
+
+    FOREIGN KEY (youtube_video_id) REFERENCES youtube_videos(id)
+);
+
+INSERT INTO video_report_categories (category_name) VALUES
+    ('dead_video'),
+    ('inappropriate_content')
+    ON CONFLICT DO NOTHING;
+
+INSERT INTO t7_characters (character_name) VALUES
     ('akuma'),
     ('alisa'),
     ('anna'),
@@ -97,7 +109,7 @@ INSERT INTO t7_character (character_name) VALUES
     ('yoshimitsu')
     ON CONFLICT DO NOTHING;
 
-INSERT INTO t7_rank (rank_name) VALUES
+INSERT INTO t7_ranks (rank_name) VALUES
     ('beginner'),
     ('1st_kyu'),
     ('2nd_kyu'),
