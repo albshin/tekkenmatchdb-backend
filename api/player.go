@@ -28,7 +28,7 @@ func (h *Handler) GetPlayers(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) CreatePlayer(w http.ResponseWriter, r *http.Request) {
 	var req model.Player
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		sendError(w, "error", http.StatusBadRequest)
+		sendError(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	defer r.Body.Close()
