@@ -44,6 +44,7 @@ func main() {
 
 		r.Get("/matches", h.GetMatches)
 		r.With(jsonRequired).Post("/matches", h.CreateMatches)
+		r.With(jsonRequired).Post("/matches/report", h.ReportMatch)
 
 		r.Get("/players", h.GetPlayers)
 		r.Get("/players/{player_id}", h.GetPlayer)

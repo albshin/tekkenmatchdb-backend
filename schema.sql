@@ -1,5 +1,3 @@
-DROP TABLE IF EXISTS youtube_video_reports;
-DROP TABLE IF EXISTS video_report_categories;
 DROP TABLE IF EXISTS youtube_videos;
 DROP TABLE IF EXISTS matches;
 DROP TABLE IF EXISTS players;
@@ -25,7 +23,6 @@ CREATE TABLE IF NOT EXISTS players (
     created_at timestamptz NOT NULL DEFAULT NOW(),
     updated_at timestamptz NOT NULL DEFAULT NOW()
 );
-
 
 CREATE TABLE IF NOT EXISTS matches (
     id serial NOT NULL PRIMARY KEY,
@@ -54,18 +51,13 @@ CREATE TABLE IF NOT EXISTS youtube_videos (
     FOREIGN KEY (match_id) REFERENCES matches(id)
 );
 
-CREATE TABLE IF NOT EXISTS youtube_video_reports (
+CREATE TABLE IF NOT EXISTS match_reports (
     id serial NOT NULL PRIMARY KEY,
-    youtube_video_id int NOT NULL,
-    category text NOT NULL REFERENCES video_report_categories(category_name),
+    match_id int NOT NULL,
+    data jsonb,
 
-    FOREIGN KEY (youtube_video_id) REFERENCES youtube_videos(id)
+    FOREIGN KEY (match_id) REFERENCES matches(id)
 );
-
-INSERT INTO video_report_categories (category_name) VALUES
-    ('dead_video'),
-    ('inappropriate_content')
-    ON CONFLICT DO NOTHING;
 
 INSERT INTO t7_characters (character_name) VALUES
     ('akuma'),
