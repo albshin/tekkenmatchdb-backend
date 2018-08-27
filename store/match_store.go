@@ -49,9 +49,9 @@ func (db *PGStore) GetMatches(matchFilters *model.MatchFilter, pageParams *model
 		q = q.Offset(pageParams.Offset())
 	}
 
-	sql, args, _ := q.PlaceholderFormat(sq.Dollar).ToSql()
+	stmt, args, _ := q.PlaceholderFormat(sq.Dollar).ToSql()
 	// TODO: Optimize to not be n+1
-	if err := db.Select(&matches, sql, args...); err != nil {
+	if err := db.Select(&matches, stmt, args...); err != nil {
 		return nil, err
 	}
 	ytvq := `SELECT * FROM youtube_videos WHERE match_id=$1`
@@ -162,8 +162,8 @@ func (db *PGStore) GetMatchesByPlayerID(playerID int, matchFilters *model.MatchF
 		q = q.Offset(pageParams.Offset())
 	}
 
-	sql, args, _ := q.PlaceholderFormat(sq.Dollar).ToSql()
-	if err := db.Select(&matches, sql, args...); err != nil {
+	stmt, args, _ := q.PlaceholderFormat(sq.Dollar).ToSql()
+	if err := db.Select(&matches, stmt, args...); err != nil {
 		return nil, err
 	}
 	return matches, nil

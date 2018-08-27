@@ -1,6 +1,8 @@
 package store
 
-import "github.com/albshin/tekkenmatchdb-backend/model"
+import (
+	"github.com/albshin/tekkenmatchdb-backend/model"
+)
 
 func (db *PGStore) CreatePlayer(req *model.Player) (*model.Player, error) {
 	q := `

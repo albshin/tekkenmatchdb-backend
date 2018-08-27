@@ -1,10 +1,10 @@
 package model
 
 import (
+	"regexp"
 	"time"
 
 	"github.com/go-ozzo/ozzo-validation"
-	"github.com/go-ozzo/ozzo-validation/is"
 
 	"github.com/gobuffalo/pop/nulls"
 )
@@ -37,13 +37,11 @@ type Match struct {
 func (m *Match) Validate() error {
 	return validation.ValidateStruct(m,
 		//validation.Field(&m.MatchDate, validation.Required, validation.Date("YYYY-MM-DD")),
-		validation.Field(&m.EventName, validation.Required, is.Alphanumeric),
-		validation.Field(&m.P1ID, validation.Required, is.Digit),
-		validation.Field(&m.P2ID, validation.Required, is.Digit),
-		validation.Field(&m.P1Rank, is.Alpha),
-		validation.Field(&m.P2Rank, is.Alpha),
-		validation.Field(&m.P1Character, validation.Required, is.Alpha),
-		validation.Field(&m.P2Character, validation.Required, is.Alpha),
+		//validation.Field(&m.EventName, validation.Required, is.Alphanumeric),
+		validation.Field(&m.P1Rank, validation.Match(regexp.MustCompile(`[a-zA-Z0-9_]`))),
+		validation.Field(&m.P2Rank, validation.Match(regexp.MustCompile(`[a-zA-Z0-9_]`))),
+		validation.Field(&m.P1Character, validation.Required, validation.Match(regexp.MustCompile(`[a-zA-Z0-9_]`))),
+		validation.Field(&m.P2Character, validation.Required, validation.Match(regexp.MustCompile(`[a-zA-Z0-9_]`))),
 		validation.Field(&m.Winner, validation.Required, validation.In("p1", "p2", "draw")),
 		validation.Field(&m.YoutubeVideos),
 	)

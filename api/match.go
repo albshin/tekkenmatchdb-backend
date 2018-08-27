@@ -58,14 +58,14 @@ func (h *Handler) GetMatchesByPlayerID(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) CreateMatches(w http.ResponseWriter, r *http.Request) {
 	var req []*model.Match
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		sendError(w, "error", http.StatusBadRequest)
+		sendError(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	defer r.Body.Close()
 
 	for _, match := range req {
 		if err := match.Validate(); err != nil {
-			sendError(w, "error", http.StatusBadRequest)
+			sendError(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 	}

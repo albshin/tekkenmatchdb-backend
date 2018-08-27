@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/go-ozzo/ozzo-validation"
-	"github.com/go-ozzo/ozzo-validation/is"
 
 	"github.com/gobuffalo/pop/nulls"
 )
@@ -24,7 +23,6 @@ type YoutubeVideo struct {
 func (y *YoutubeVideo) Validate() error {
 	// YoutubeID regex is subject to change
 	return validation.ValidateStruct(y,
-		validation.Field(&y.MatchID, validation.Required, is.Digit),
 		validation.Field(&y.VideoID, validation.Required, validation.Match(regexp.MustCompile(`[a-zA-Z0-9_-]{11}`))),
 		validation.Field(&y.VideoTimestamp, validation.Required, validation.Match(regexp.MustCompile(`^[0-9]{2}h[0-9]{2}m[0-9]{2}s$`))),
 		validation.Field(&y.PlayerSide, validation.In("p1", "p2")),
