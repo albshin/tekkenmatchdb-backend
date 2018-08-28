@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS match_reports;
 DROP TABLE IF EXISTS youtube_videos;
 DROP TABLE IF EXISTS matches;
 DROP TABLE IF EXISTS players;
@@ -10,10 +11,6 @@ CREATE TABLE IF NOT EXISTS t7_characters (
 
 CREATE TABLE IF NOT EXISTS t7_ranks (
     rank_name text NOT NULL PRIMARY KEY
-);
-
-CREATE TABLE IF NOT EXISTS video_report_categories (
-    category_name text NOT NULL PRIMARY KEY
 );
 
 CREATE TABLE IF NOT EXISTS players (

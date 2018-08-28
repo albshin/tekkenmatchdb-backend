@@ -2,7 +2,7 @@ package store
 
 import "github.com/albshin/tekkenmatchdb-backend/model"
 
-func (db *PGStore) ReportMatch(req *model.MatchReport) (*model.MatchReport, error) {
+func (db *PGStore) CreateMatchReport(req *model.MatchReport) (*model.MatchReport, error) {
 	q := `
 	INSERT INTO match_reports
 	(match_id, data)
