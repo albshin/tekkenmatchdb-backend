@@ -36,3 +36,11 @@ func (db *PGStore) GetPlayers(pageParams *model.Pagination) ([]*model.Player, er
 	}
 	return players, nil
 }
+
+func (db *PGStore) GetPlayerNames() ([]*model.PlayerName, error) {
+	names := make([]*model.PlayerName, 0)
+	if err := db.Select(&names, "SELECT player_name FROM players"); err != nil {
+		return nil, err
+	}
+	return names, nil
+}

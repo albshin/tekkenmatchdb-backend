@@ -16,6 +16,11 @@ type Player struct {
 	UpdatedAt  *time.Time `json:"updated_at,omitempty" db:"updated_at"`
 }
 
+// PlayerName is an object representing a Player object's name.
+type PlayerName struct {
+	PlayerName string `json:"player_name" db:"player_name"`
+}
+
 func (p *Player) Validate() error {
 	return validation.ValidateStruct(p,
 		validation.Field(&p.PlayerName, validation.Required, is.Alphanumeric),

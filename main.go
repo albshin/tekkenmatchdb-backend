@@ -47,9 +47,13 @@ func main() {
 		r.With(jsonRequired).Post("/matches/report", h.CreateMatchReport)
 
 		r.Get("/players", h.GetPlayers)
+		r.Get("/players/names", h.GetPlayerNames)
 		r.Get("/players/{player_id}", h.GetPlayer)
 		r.Get("/players/{player_id}/matches", h.GetMatchesByPlayerID)
 		r.With(jsonRequired).Post("/player", h.CreatePlayer)
+
+		r.Get("/characters", h.GetCharacters)
+		r.Get("/ranks", h.GetRanks)
 	})
 
 	http.ListenAndServe(":4000", r)

@@ -55,3 +55,12 @@ func (h *Handler) GetPlayer(w http.ResponseWriter, r *http.Request) {
 	}
 	sendJSON(w, &res, http.StatusOK)
 }
+
+func (h *Handler) GetPlayerNames(w http.ResponseWriter, r *http.Request) {
+	res, err := h.Store.GetPlayerNames()
+	if err != nil {
+		sendError(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	sendJSON(w, &res, http.StatusOK)
+}
