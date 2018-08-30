@@ -1,6 +1,8 @@
 package store
 
 import (
+	"strings"
+
 	sq "github.com/Masterminds/squirrel"
 	"github.com/albshin/tekkenmatchdb-backend/model"
 	"github.com/jmoiron/sqlx"
@@ -29,10 +31,10 @@ func (db *PGStore) GetMatches(matchFilters *model.MatchFilter, pageParams *model
 		q = q.Where(sq.Eq{"p2.player_name": matchFilters.P2Name})
 	}
 	if matchFilters.P1Rank != "" {
-		q = q.Where(sq.Eq{"matches.p1_rank": matchFilters.P1Rank})
+		q = q.Where(sq.Eq{"matches.p1_rank": strings.Split(matchFilters.P1Rank, ",")})
 	}
 	if matchFilters.P2Rank != "" {
-		q = q.Where(sq.Eq{"matches.p2_rank": matchFilters.P2Rank})
+		q = q.Where(sq.Eq{"matches.p2_rank": strings.Split(matchFilters.P2Rank, ",")})
 	}
 	if matchFilters.P1Character != "" {
 		q = q.Where(sq.Eq{"matches.p1_character": matchFilters.P1Character})
@@ -142,10 +144,10 @@ func (db *PGStore) GetMatchesByPlayerID(playerID int, matchFilters *model.MatchF
 		q = q.Where(sq.Eq{"p2.player_name": matchFilters.P2Name})
 	}
 	if matchFilters.P1Rank != "" {
-		q = q.Where(sq.Eq{"matches.p1_rank": matchFilters.P1Rank})
+		q = q.Where(sq.Eq{"matches.p1_rank": strings.Split(matchFilters.P1Rank, ",")})
 	}
 	if matchFilters.P2Rank != "" {
-		q = q.Where(sq.Eq{"matches.p2_rank": matchFilters.P2Rank})
+		q = q.Where(sq.Eq{"matches.p2_rank": strings.Split(matchFilters.P2Rank, ",")})
 	}
 	if matchFilters.P1Character != "" {
 		q = q.Where(sq.Eq{"matches.p1_character": matchFilters.P1Character})
