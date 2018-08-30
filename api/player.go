@@ -10,6 +10,21 @@ import (
 	"github.com/albshin/tekkenmatchdb-backend/model"
 )
 
+func (h *Handler) GetPlayer(w http.ResponseWriter, r *http.Request) {
+	playerID := chi.URLParam(r, "player_id")
+	pID, err := strconv.Atoi(playerID)
+	if err != nil {
+		sendError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	res, err := h.Store.GetPlayer(pID)
+	if err != nil {
+		sendError(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	sendJSON(w, &res, http.StatusOK)
+}
+
 func (h *Handler) GetPlayers(w http.ResponseWriter, r *http.Request) {
 	pageParams, err := withPagination(r)
 	if err != nil {
@@ -18,6 +33,15 @@ func (h *Handler) GetPlayers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	res, err := h.Store.GetPlayers(pageParams)
+	if err != nil {
+		sendError(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	sendJSON(w, &res, http.StatusOK)
+}
+
+func (h *Handler) GetPlayerNames(w http.ResponseWriter, r *http.Request) {
+	res, err := h.Store.GetPlayerNames()
 	if err != nil {
 		sendError(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -39,28 +63,4 @@ func (h *Handler) CreatePlayer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	sendJSON(w, &res, http.StatusCreated)
-}
-
-func (h *Handler) GetPlayer(w http.ResponseWriter, r *http.Request) {
-	playerID := chi.URLParam(r, "player_id")
-	pID, err := strconv.Atoi(playerID)
-	if err != nil {
-		sendError(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	res, err := h.Store.GetPlayer(pID)
-	if err != nil {
-		sendError(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	sendJSON(w, &res, http.StatusOK)
-}
-
-func (h *Handler) GetPlayerNames(w http.ResponseWriter, r *http.Request) {
-	res, err := h.Store.GetPlayerNames()
-	if err != nil {
-		sendError(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	sendJSON(w, &res, http.StatusOK)
 }
