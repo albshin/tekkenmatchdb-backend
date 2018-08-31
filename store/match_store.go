@@ -8,38 +8,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-func parseFilters(q sq.SelectBuilder, mf *model.MatchFilter, p *model.Pagination) (string, []interface{}) {
-	if mf.P1Name != "" {
-		q = q.Where(sq.Eq{"p1.player_name": mf.P1Name})
-	}
-	if mf.P2Name != "" {
-		q = q.Where(sq.Eq{"p2.player_name": mf.P2Name})
-	}
-	if mf.P1Rank != "" {
-		q = q.Where(sq.Eq{"matches.p1_rank": strings.Split(mf.P1Rank, ",")})
-	}
-	if mf.P2Rank != "" {
-		q = q.Where(sq.Eq{"matches.p2_rank": strings.Split(mf.P2Rank, ",")})
-	}
-	if mf.P1Character != "" {
-		q = q.Where(sq.Eq{"matches.p1_character": mf.P1Character})
-	}
-	if mf.P2Character != "" {
-		q = q.Where(sq.Eq{"matches.p2_rank": mf.P2Character})
-	}
-	if mf.Winner != "" {
-		q = q.Where(sq.Eq{"matches.winner": mf.Winner})
-	}
-
-	if p != nil {
-		q = q.Limit(p.Limit)
-		q = q.Offset(p.Offset())
-	}
-	stmt, args, _ := q.PlaceholderFormat(sq.Dollar).ToSql()
-	return stmt, args
-}
-
-func (db *PGStore) GetMatches(matchFilters *model.MatchFilter, pageParams *model.Pagination) ([]*model.GetMatch, error) {
+func (db *PGStore) GetMatches(mf *model.MatchFilter, pageParams *model.Pagination) ([]*model.GetMatch, error) {
 	matches := make([]*model.GetMatch, 0)
 	q := sq.Select(`
 		matches.*,
@@ -54,7 +23,7 @@ func (db *PGStore) GetMatches(matchFilters *model.MatchFilter, pageParams *model
 	`).Join(`
 		players p2 ON matches.p2_id = p2.id
 	`)
-	stmt, args := parseFilters(q, matchFilters, pageParams)
+	stmt, args := parseFilters(q, mf, pageParams)
 
 	// TODO: Optimize to not be n+1
 	if err := db.Select(&matches, stmt, args...); err != nil {
@@ -67,6 +36,32 @@ func (db *PGStore) GetMatches(matchFilters *model.MatchFilter, pageParams *model
 		}
 	}
 
+	return matches, nil
+}
+
+func (db *PGStore) GetMatchesByPlayerID(playerID int, mf *model.MatchFilter, pageParams *model.Pagination) ([]*model.GetMatch, error) {
+	matches := make([]*model.GetMatch, 0)
+	q := sq.Select(`
+		matches.*,
+		p1.player_name AS p1_name,
+		p1.country AS p1_country,
+		p2.player_name AS p2_name,
+		p2.country AS p2_country
+	`).From(`
+		matches
+	`).Join(`
+		players p1 ON matches.p1_id = p1.id
+	`).Join(`
+		players p2 ON matches.p2_id = p2.id
+	`).Where(sq.Or{
+		sq.Eq{"matches.p1_id": playerID},
+		sq.Eq{"matches.p2_id": playerID},
+	})
+
+	stmt, args := parseFilters(q, mf, pageParams)
+	if err := db.Select(&matches, stmt, args...); err != nil {
+		return nil, err
+	}
 	return matches, nil
 }
 
@@ -122,28 +117,43 @@ func createMatch(tx *sqlx.Tx, req *model.Match) error {
 	return nil
 }
 
-func (db *PGStore) GetMatchesByPlayerID(playerID int, matchFilters *model.MatchFilter, pageParams *model.Pagination) ([]*model.GetMatch, error) {
-	matches := make([]*model.GetMatch, 0)
-	q := sq.Select(`
-		matches.*,
-		p1.player_name AS p1_name,
-		p1.country AS p1_country,
-		p2.player_name AS p2_name,
-		p2.country AS p2_country
-	`).From(`
-		matches
-	`).Join(`
-		players p1 ON matches.p1_id = p1.id
-	`).Join(`
-		players p2 ON matches.p2_id = p2.id
-	`).Where(sq.Or{
-		sq.Eq{"matches.p1_id": playerID},
-		sq.Eq{"matches.p2_id": playerID},
-	})
-
-	stmt, args := parseFilters(q, matchFilters, pageParams)
-	if err := db.Select(&matches, stmt, args...); err != nil {
-		return nil, err
+func parseFilters(q sq.SelectBuilder, mf *model.MatchFilter, p *model.Pagination) (string, []interface{}) {
+	if mf.P1Name != "" {
+		// Get both bears
+		if mf.P1Name == "Kuma" || mf.P2Name == "Panda" {
+			q = q.Where(sq.Eq{"p1.player_name": []string{"Kuma", "Panda"}})
+		} else {
+			q = q.Where(sq.Eq{"p1.player_name": mf.P1Name})
+		}
 	}
-	return matches, nil
+	if mf.P2Name != "" {
+		// Get both bears
+		if mf.P1Name == "Kuma" || mf.P2Name == "Panda" {
+			q = q.Where(sq.Eq{"p2.player_name": []string{"Kuma", "Panda"}})
+		} else {
+			q = q.Where(sq.Eq{"p2.player_name": mf.P2Name})
+		}
+	}
+	if mf.P1Rank != "" {
+		q = q.Where(sq.Eq{"matches.p1_rank": strings.Split(mf.P1Rank, ",")})
+	}
+	if mf.P2Rank != "" {
+		q = q.Where(sq.Eq{"matches.p2_rank": strings.Split(mf.P2Rank, ",")})
+	}
+	if mf.P1Character != "" {
+		q = q.Where(sq.Eq{"matches.p1_character": mf.P1Character})
+	}
+	if mf.P2Character != "" {
+		q = q.Where(sq.Eq{"matches.p2_rank": mf.P2Character})
+	}
+	if mf.Winner != "" {
+		q = q.Where(sq.Eq{"matches.winner": mf.Winner})
+	}
+
+	if p != nil {
+		q = q.Limit(p.Limit)
+		q = q.Offset(p.Offset())
+	}
+	stmt, args, _ := q.PlaceholderFormat(sq.Dollar).ToSql()
+	return stmt, args
 }
