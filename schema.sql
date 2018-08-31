@@ -62,7 +62,6 @@ INSERT INTO t7_characters (character_name) VALUES
     ('Asuka'),
     ('Bob'),
     ('Bryan'),
-    ('Chloe'),
     ('Claudio'),
     ('Devil Jin'),
     ('Dragunov'),
@@ -82,11 +81,12 @@ INSERT INTO t7_characters (character_name) VALUES
     ('Lars'),
     ('Law'),
     ('Lee'),
-    ('Lei'),
     ('Leo'),
     ('Lili'),
+    ('Lucky Chloe'),
     ('Miguel'),
     ('Nina'),
+    ('Noctis'),
     ('Panda'),
     ('Paul'),
     ('Master Raven'),
@@ -146,14 +146,4 @@ INSERT INTO t7_ranks (rank_name) VALUES
     ON CONFLICT DO NOTHING;
 
 INSERT INTO players (player_name, country) VALUES ('LowHigh', 'KR');
-INSERT INTO players (player_name, country) VALUES ('Qudans', 'KR');
-INSERT INTO players (player_name, country) VALUES ('Knee', 'KR');
-
-INSERT INTO matches (match_date, event_name, p1_id, p2_id, p1_rank, p2_rank, p1_character, p2_character, winner)
-VALUES (NOW(), 'Evo', 1, 2, 'Vanquisher', 'Vindicator', 'Shaheen', 'Alisa', 'p1');
-
-INSERT INTO matches (match_date, event_name, p1_id, p2_id, p1_rank, p2_rank, p1_character, p2_character, winner)
-VALUES (NOW(), 'Evo', 1, 3, 'Vanquisher', 'Vindicator', 'Shaheen', 'Devil Jin', 'p1');
-
-INSERT INTO matches (match_date, event_name, p1_id, p2_id, p1_rank, p2_rank, p1_character, p2_character, winner)
-VALUES (NOW(), 'Evo', 2, 3, 'Vanquisher', 'Vindicator', 'Bob', 'Steve', 'p2');
+INSERT INTO players (player_name, country) VALUES ('Wecka', 'KR');
