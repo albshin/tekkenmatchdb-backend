@@ -118,22 +118,33 @@ func createMatch(tx *sqlx.Tx, req *model.Match) error {
 }
 
 func parseFilters(q sq.SelectBuilder, mf *model.MatchFilter, p *model.Pagination) (string, []interface{}) {
-	if mf.P1Name != "" {
-		// Get both bears
-		if mf.P1Name == "Kuma" || mf.P2Name == "Panda" {
-			q = q.Where(sq.Eq{"p1.player_name": []string{"Kuma", "Panda"}})
-		} else {
-			q = q.Where(sq.Eq{"p1.player_name": mf.P1Name})
-		}
+	// Handle where one user is searched for
+	if mf.P1Name != "" && mf.P2Name == "" {
+		q = q.Where(sq.Or{
+			sq.Eq{"p1.player_name": mf.P1Name},
+			sq.Eq{"p2.player_name": mf.P1Name},
+		})
+	} else if mf.P1Name == "" && mf.P2Name != "" {
+		q = q.Where(sq.Or{
+			sq.Eq{"p1.player_name": mf.P2Name},
+			sq.Eq{"p2.player_name": mf.P2Name},
+		})
+	} else {
+		// Get both sides of the matchup
+		q = q.Where(sq.Or{
+			sq.And{
+				sq.Eq{"p1.player_name": mf.P1Name},
+				sq.Eq{"p2.player_name": mf.P2Name},
+			},
+			sq.And{
+				sq.Eq{"p1.player_name": mf.P2Name},
+				sq.Eq{"p2.player_name": mf.P1Name},
+			},
+		})
 	}
-	if mf.P2Name != "" {
-		// Get both bears
-		if mf.P1Name == "Kuma" || mf.P2Name == "Panda" {
-			q = q.Where(sq.Eq{"p2.player_name": []string{"Kuma", "Panda"}})
-		} else {
-			q = q.Where(sq.Eq{"p2.player_name": mf.P2Name})
-		}
-	}
+
+	// Splits accept multiple values delimited by ','. Character accepts
+	// multiple characters to handle Kuma/Panda
 	if mf.P1Rank != "" {
 		q = q.Where(sq.Eq{"matches.p1_rank": strings.Split(mf.P1Rank, ",")})
 	}
@@ -141,10 +152,10 @@ func parseFilters(q sq.SelectBuilder, mf *model.MatchFilter, p *model.Pagination
 		q = q.Where(sq.Eq{"matches.p2_rank": strings.Split(mf.P2Rank, ",")})
 	}
 	if mf.P1Character != "" {
-		q = q.Where(sq.Eq{"matches.p1_character": mf.P1Character})
+		q = q.Where(sq.Eq{"matches.p1_character": strings.Split(mf.P1Character, ",")})
 	}
 	if mf.P2Character != "" {
-		q = q.Where(sq.Eq{"matches.p2_rank": mf.P2Character})
+		q = q.Where(sq.Eq{"matches.p2_rank": strings.Split(mf.P2Character, ",")})
 	}
 	if mf.Winner != "" {
 		q = q.Where(sq.Eq{"matches.winner": mf.Winner})
