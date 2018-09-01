@@ -11,7 +11,7 @@ import (
 )
 
 type Handler struct {
-	Store store.Store
+	Store store.Storage
 }
 
 func NewRouter(h *Handler) *chi.Mux {
