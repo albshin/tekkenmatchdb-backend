@@ -5,7 +5,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type Store interface {
+type Storage interface {
 	GetMatches(mf *model.MatchFilter, pageParams *model.Pagination) ([]*model.GetMatch, error)
 	GetMatchesByPlayerID(playerID int, mf *model.MatchFilter, pageParams *model.Pagination) ([]*model.GetMatch, error)
 	CreateMatches(matches []*model.Match) ([]*model.Match, error)
